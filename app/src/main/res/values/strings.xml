@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Exercise 1</string>
+
+    <string name="subject_name">Mobile systems security</string>
+    <string name="exercise_number">Exercise 1</string>
+
+    <string name="button_create_password">Create password</string>
+    <string name="button_access_message">Access message</string>
+    <string name="button_change_password">Change password</string>
+
+    <string name="write_password">Write down your password</string>
+    <string name="save_button">Save</string>
+    <string name="write_password_again">Write it again to check</string>
+
+    <string name="message">Message</string>
+    <string name="enter_new_message">Enter new message</string>
+
+
+    <string name="write_new_password">Write your new password</string>
+
+</resources>

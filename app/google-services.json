@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "641188476483",
+    "firebase_url": "https://mssecurity-exercise-1.firebaseio.com",
+    "project_id": "mssecurity-exercise-1",
+    "storage_bucket": "mssecurity-exercise-1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:641188476483:android:e282766201276d910546f6",
+        "android_client_info": {
+          "package_name": "com.huesosco.mssecurity_exercise1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "641188476483-jgp89qjdi1pgm6lh07c1sn8u7buhhtg6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.huesosco.mssecurity_exercise1",
+            "certificate_hash": "e1129cd7e8af8657abe2532cdea6701e73c7077b"
+          }
+        },
+        {
+          "client_id": "641188476483-b9mkf2op0uatq4471a73rna7kafj7ndc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPu7hLjX79SYwOvFmz-pdDIG7emYUqXPI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "641188476483-b9mkf2op0uatq4471a73rna7kafj7ndc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
