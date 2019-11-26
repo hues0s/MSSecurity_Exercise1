@@ -18,12 +18,10 @@ import com.huesosco.mssecurity_exercise1.utilities.HashClass
 import java.lang.Exception
 
 
-class PassCheckDialog(buttonType: String): DialogFragment() {
+class PassCheckDialog(private val buttonType: String): DialogFragment() {
 
     private var db: FirebaseFirestore = FirebaseFirestore.getInstance()
     private var exercise1CollectionRef: CollectionReference = db.collection("exercise1")
-
-    private val buttonType = buttonType
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 

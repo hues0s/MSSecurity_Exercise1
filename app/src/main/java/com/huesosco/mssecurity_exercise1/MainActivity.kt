@@ -7,16 +7,12 @@ import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.Toast
-import com.google.android.gms.tasks.OnCanceledListener
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
-import com.huesosco.mssecurity_exercise1.utilities.HashClass
 import java.lang.Exception
-import java.math.BigInteger
-import java.security.MessageDigest
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,6 +30,7 @@ class MainActivity : AppCompatActivity() {
 
         loadXmlReferences()
         setUpButtons()
+
     }
 
     override fun onResume() {
@@ -90,7 +87,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setUpButtons() {
         buttonCreatePassword.setOnClickListener {
-            val i = Intent(applicationContext, CreatePassActivity::class.java)
+            val i = Intent(applicationContext, ChangePassActivity::class.java)
             i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             applicationContext.startActivity(i)
         }
@@ -103,6 +100,8 @@ class MainActivity : AppCompatActivity() {
             dialog.show(supportFragmentManager, "pass dialog")
         }
     }
+
+
 
 
 }
