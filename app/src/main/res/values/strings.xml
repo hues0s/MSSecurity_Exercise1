@@ -18,4 +18,6 @@
 
     <string name="write_new_password">Write your new password</string>
 
+    <string name="current_pass_mode">Current password mode:</string>
+
 </resources>

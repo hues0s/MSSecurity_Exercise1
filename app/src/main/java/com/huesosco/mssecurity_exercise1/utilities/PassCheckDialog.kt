@@ -1,4 +1,4 @@
-package com.huesosco.mssecurity_exercise1
+package com.huesosco.mssecurity_exercise1.utilities
 
 import android.content.Intent
 import android.os.Bundle
@@ -14,7 +14,9 @@ import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
-import com.huesosco.mssecurity_exercise1.utilities.HashClass
+import com.huesosco.mssecurity_exercise1.ChangePassActivity
+import com.huesosco.mssecurity_exercise1.MessageActivity
+import com.huesosco.mssecurity_exercise1.R
 import java.lang.Exception
 
 
@@ -48,22 +50,24 @@ class PassCheckDialog(private val buttonType: String): DialogFragment() {
                         for(doc in querySnapshot.documents){
                             //we search for the password Document in the database
                             //the pass try in sha256 must be equal to the one saved and encoded before
-                            if(doc.id == "passwordDoc" && doc.data!!["pass"] == HashClass.sha256(passTry)){
-                                if(buttonType == "ACCESS_MESSAGE"){
-                                    val i = Intent(dialogView.context, MessageActivity::class.java)
-                                    i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                    dialogView.context.startActivity(i)
+                            if(doc.id == "passwordDoc"){
+                                if(doc.data!!["pass"] == HashClass.sha256(passTry)){
+                                    if(buttonType == "ACCESS_MESSAGE"){
+                                        val i = Intent(dialogView.context, MessageActivity::class.java)
+                                        i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                        dialogView.context.startActivity(i)
+                                    }
+                                    else if(buttonType == "CHANGE_PASSWORD"){
+                                        val i = Intent(dialogView.context, ChangePassActivity::class.java)
+                                        i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                        dialogView.context.startActivity(i)
+                                    }
+                                    dismiss()
                                 }
-                                else if(buttonType == "CHANGE_PASSWORD"){
-                                    val i = Intent(dialogView.context, ChangePassActivity::class.java)
-                                    i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                    dialogView.context.startActivity(i)
+                                else{
+                                    Toast.makeText(dialogView.context, "The password written is wrong.", Toast.LENGTH_SHORT).show()
+                                    dismiss()
                                 }
-                                dismiss()
-                            }
-                            else{
-                                Toast.makeText(dialogView.context, "The password written is wrong.", Toast.LENGTH_SHORT).show()
-                                dismiss()
                             }
                         }
                     }

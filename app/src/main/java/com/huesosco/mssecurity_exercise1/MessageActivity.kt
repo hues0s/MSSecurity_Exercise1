@@ -12,6 +12,7 @@ import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import com.huesosco.mssecurity_exercise1.utilities.AESClass
 import java.lang.Exception
 
 class MessageActivity : AppCompatActivity() {
@@ -22,6 +23,8 @@ class MessageActivity : AppCompatActivity() {
     private lateinit var textView: TextView
     private lateinit var editText: EditText
     private lateinit var button: Button
+
+    private var messageEncryptedPass = String()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,15 +48,26 @@ class MessageActivity : AppCompatActivity() {
                 override fun onSuccess(querySnapshot: QuerySnapshot?) {
 
                     if (querySnapshot != null) {
-                        for(doc in querySnapshot.documents){
-                            //we search for the message Document in the database
-                            if(doc.id == "messageDoc"){
-                                textView.text = doc.data!!["message"].toString()
-                                Toast.makeText(applicationContext, "Message successfully loaded.", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    }
 
+                        var messageEncrypted = String()
+
+                        for(doc in querySnapshot.documents){
+                            //we search for the message Document in the database, and the AES password, which
+                            //is the one set before by the user
+
+                            if(doc.id == "messageDoc")
+                                messageEncrypted = doc.data!!["message"].toString()
+
+                            if(doc.id == "passwordDoc")
+                                messageEncryptedPass = doc.data!!["pass"].toString()
+                        }
+
+                        //once we have the message encrypted and its pass, we decrypt it
+                        textView.text = if(messageEncrypted.isNotEmpty())
+                            AESClass.decryptAES(messageEncrypted, messageEncryptedPass)
+                        else ""
+                        Toast.makeText(applicationContext, "Message successfully loaded.", Toast.LENGTH_SHORT).show()
+                    }
                 }
             })
             .addOnFailureListener(object: OnFailureListener {
@@ -70,7 +84,7 @@ class MessageActivity : AppCompatActivity() {
                 Toast.makeText(applicationContext, "You must write a message.", Toast.LENGTH_SHORT).show()
             else{
                 exercise1CollectionRef
-                    .document("messageDoc").update("message", e1)
+                    .document("messageDoc").update("message", AESClass.encryptAES(e1, messageEncryptedPass))
                     .addOnSuccessListener {
                         Toast.makeText(applicationContext, "Message successfully saved.", Toast.LENGTH_SHORT).show()
                         textView.text = e1
