@@ -32,11 +32,6 @@ class CustomBiometricPrompt(private val fragmentActivity: FragmentActivity, priv
                         i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         fragmentActivity.startActivity(i)
                     }
-                    else if(buttonType == "CHANGE_PASSWORD"){
-                        val i = Intent(fragmentActivity, ChangePassActivity::class.java)
-                        i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        fragmentActivity.startActivity(i)
-                    }
                 }
             }
 

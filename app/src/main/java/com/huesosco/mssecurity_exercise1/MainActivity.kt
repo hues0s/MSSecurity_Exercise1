@@ -14,6 +14,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.huesosco.mssecurity_exercise1.utilities.CustomBiometricPrompt
 import com.huesosco.mssecurity_exercise1.utilities.PassCheckDialog
 import java.lang.Exception
+import kotlin.system.exitProcess
 
 
 class MainActivity : AppCompatActivity() {
@@ -29,14 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var switchPasswordMode: Switch
     private lateinit var textViewSwitch: TextView
 
-
     private var hasResetedDatabase: Boolean = false
-
-/*
-1 - corregir lo de que la contraseña del mensaje sea la pass hasheada; utilizarla en texto plano
-2 - añadir un salt aleatorio, unico para cada user
-3 - corregir lo de la huella
- */
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +39,7 @@ class MainActivity : AppCompatActivity() {
 
         loadXmlReferences()
 
-        setUpSwitch()
+        //setUpSwitch()
         setUpButtons()
     }
 
@@ -55,13 +49,15 @@ class MainActivity : AppCompatActivity() {
         checkIfPasswordHasBeenCreated()
     }
 
+
+
     private fun loadXmlReferences(){
         buttonCreatePassword = findViewById(R.id.main_button_create_password)
         buttonChangePassword = findViewById(R.id.main_button_change_password)
         buttonAccessMessage = findViewById(R.id.main_button_access_message)
         progressBar = findViewById(R.id.main_progress_bar)
-        switchPasswordMode = findViewById(R.id.main_switch_password_mode)
-        textViewSwitch = findViewById(R.id.main_textview_switch)
+        //switchPasswordMode = findViewById(R.id.main_switch_password_mode)
+        //textViewSwitch = findViewById(R.id.main_textview_switch)
     }
 
     private fun checkIfPasswordHasBeenCreated() {
@@ -88,7 +84,8 @@ class MainActivity : AppCompatActivity() {
 
                         for(doc in querySnapshot.documents){
                             //we search for the password Document in the database
-                            if(doc.id == "passwordDoc"){
+                            if(//!switchPasswordMode.isChecked &&
+                                doc.id == "passwordDoc"){
                                 //once we have it, we check if a password has been previously created
                                 if (doc.data!!["pass"] == "") {
                                     //no pass previously created. we show create password button
@@ -98,8 +95,6 @@ class MainActivity : AppCompatActivity() {
                                     buttonChangePassword.visibility = View.INVISIBLE
                                     buttonAccessMessage.visibility = View.INVISIBLE
 
-                                    switchPasswordMode.visibility = View.INVISIBLE
-                                    textViewSwitch.visibility = View.INVISIBLE
                                 }
                                 else {
                                     //we have pass, so we show the other buttons
@@ -109,8 +104,6 @@ class MainActivity : AppCompatActivity() {
                                     buttonChangePassword.visibility = View.VISIBLE
                                     buttonAccessMessage.visibility = View.VISIBLE
 
-                                    switchPasswordMode.visibility = View.VISIBLE
-                                    textViewSwitch.visibility = View.VISIBLE
                                 }
                             }
                         }
@@ -133,20 +126,18 @@ class MainActivity : AppCompatActivity() {
         }
         buttonAccessMessage.setOnClickListener {
             val buttonType = "ACCESS_MESSAGE"
-            if(switchPasswordMode.isChecked)
+            /*if(switchPasswordMode.isChecked)
                 //fingerprint dialog
-                //CustomBiometricPrompt(this, buttonType).getBiometricPromptDialog()
-            else PassCheckDialog(buttonType).show(supportFragmentManager, "pass dialog")
+                CustomBiometricPrompt(this, buttonType).getBiometricPromptDialog()
+            else */
+            PassCheckDialog(buttonType).show(supportFragmentManager, "pass dialog")
         }
         buttonChangePassword.setOnClickListener {
             val buttonType = "CHANGE_PASSWORD"
-            if(switchPasswordMode.isChecked)
-                //fingerprint dialog
-                //CustomBiometricPrompt(this, buttonType).getBiometricPromptDialog()
-            else PassCheckDialog(buttonType).show(supportFragmentManager, "pass dialog")
+            PassCheckDialog(buttonType).show(supportFragmentManager, "pass dialog")
         }
     }
-
+/*
     private fun setUpSwitch(){
 
         textViewSwitch.text = "${resources.getString(R.string.current_pass_mode)} Text"
@@ -157,6 +148,9 @@ class MainActivity : AppCompatActivity() {
                     if (BiometricManager.from(applicationContext).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS) {
                         //only allow to click the switch if the device has biometric sensor
                         textViewSwitch.text = "${resources.getString(R.string.current_pass_mode)} Fingerprint"
+                        buttonCreatePassword.visibility = View.INVISIBLE
+                        buttonChangePassword.visibility = View.INVISIBLE
+                        buttonAccessMessage.visibility = View.VISIBLE
                     }
                     else {
                         Toast.makeText(applicationContext, "You cannot use fingerprint in this device.", Toast.LENGTH_SHORT).show()
@@ -165,11 +159,13 @@ class MainActivity : AppCompatActivity() {
                 }
                 else
                     textViewSwitch.text = "${resources.getString(R.string.current_pass_mode)} Text"
+                    hasResetedDatabase = false //everytime we change between text and fingerprint, everything is reseted
+                    checkIfPasswordHasBeenCreated()
             }
 
         })
     }
-
+*/
     private fun createSalt() : String {
         val charPool : List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
         return (1..10).map { kotlin.random.Random.nextInt(0, charPool.size) }.map(charPool::get).joinToString("")
