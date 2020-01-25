@@ -29,8 +29,10 @@ class ChangePassActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_change_pass)
 
+        val passwordByUser: String? = intent.extras?.getString("passUserTry")
+
         loadXmlReferences()
-        setUpButton()
+        setUpButton(passwordByUser)
     }
 
 
@@ -41,7 +43,7 @@ class ChangePassActivity : AppCompatActivity() {
     }
 
 
-    private fun setUpButton(){
+    private fun setUpButton(oldPass: String?){
         saveButton.setOnClickListener {
 
             val e1 = editText1.text.toString()
@@ -52,17 +54,15 @@ class ChangePassActivity : AppCompatActivity() {
             else if(e1 != e2) //we check if the password in both edit text are equal
                 Toast.makeText(applicationContext, "Passwords written are not equal.", Toast.LENGTH_SHORT).show()
             else{
-                val newPass = HashClass.sha256(e1)
-                updateMessageAESPass(newPass)
+                updateMessageAESPass(e1, oldPass)
             }
         }
     }
 
 
-    private fun updateMessageAESPass(newPass: String){
+    private fun updateMessageAESPass(newPass: String, oldPass: String?){
 
         var messageEncrypted = String()
-        var oldPass = String()
         var messageDecrypted = String()
 
         exercise1CollectionRef
@@ -72,30 +72,35 @@ class ChangePassActivity : AppCompatActivity() {
 
                     if (querySnapshot != null) {
 
+                        var salt = String()
+
                         for(doc in querySnapshot.documents){
                             //we search for the message Document in the database, and the AES password, which
                             //is the one set before by the user
                             if(doc.id == "messageDoc")
                                 messageEncrypted = doc.data!!["message"].toString()
+                            /*
                             if(doc.id == "passwordDoc")
-                                oldPass = doc.data!!["pass"].toString()
+                                oldPass = doc.data!!["pass"].toString()*/
+                            if(doc.id == "saltDoc")
+                                salt = doc.data!!["salt"].toString()
                         }
                         if(messageEncrypted.isNotEmpty()){
                             //if there is a message stored, before changing the password,
                             // we have to change also the password used in the AES encryption
-                            messageDecrypted = AESClass.decryptAES(messageEncrypted, oldPass)
+                            messageDecrypted = AESClass.decryptAES(messageEncrypted, oldPass!!)
                             exercise1CollectionRef
                                 .document("messageDoc").update("message", AESClass.encryptAES(messageDecrypted, newPass))
                                 .addOnSuccessListener {
                                     //finally, we update the pass after updating the message
-                                    updatePass(newPass)
+                                    updatePass(HashClass.sha256(newPass + salt))
                                 }
                                 .addOnFailureListener {
                                     Toast.makeText(applicationContext, "ERROR: Message pass could not be updated.", Toast.LENGTH_SHORT).show()
                                 }
                         }
                         else //if we dont have any messages stored, we just update the password
-                            updatePass(newPass)
+                            updatePass(HashClass.sha256(newPass + salt))
                     }
 
                 }

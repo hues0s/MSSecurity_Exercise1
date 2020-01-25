@@ -30,6 +30,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var textViewSwitch: TextView
 
 
+    private var hasResetedDatabase: Boolean = false
+
+/*
+1 - corregir lo de que la contraseña del mensaje sea la pass hasheada; utilizarla en texto plano
+2 - añadir un salt aleatorio, unico para cada user
+3 - corregir lo de la huella
+ */
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -63,6 +72,20 @@ class MainActivity : AppCompatActivity() {
                 override fun onSuccess(querySnapshot: QuerySnapshot?) {
 
                     if (querySnapshot != null) {
+
+                        //first, we have to check whether we should reset the db, as everytime the user opens the app,
+                        //a new pass should be established
+                        if(!hasResetedDatabase){
+                            exercise1CollectionRef.document("messageDoc").update("message", "")
+                            exercise1CollectionRef.document("passwordDoc").update("pass", "")
+
+                            //now, we have to create a salt for the user.
+                            exercise1CollectionRef.document("saltDoc").update("salt", createSalt())
+
+                            hasResetedDatabase = true
+                        }
+
+
                         for(doc in querySnapshot.documents){
                             //we search for the password Document in the database
                             if(doc.id == "passwordDoc"){
@@ -112,14 +135,14 @@ class MainActivity : AppCompatActivity() {
             val buttonType = "ACCESS_MESSAGE"
             if(switchPasswordMode.isChecked)
                 //fingerprint dialog
-                CustomBiometricPrompt(this, buttonType).getBiometricPromptDialog()
+                //CustomBiometricPrompt(this, buttonType).getBiometricPromptDialog()
             else PassCheckDialog(buttonType).show(supportFragmentManager, "pass dialog")
         }
         buttonChangePassword.setOnClickListener {
             val buttonType = "CHANGE_PASSWORD"
             if(switchPasswordMode.isChecked)
                 //fingerprint dialog
-                CustomBiometricPrompt(this, buttonType).getBiometricPromptDialog()
+                //CustomBiometricPrompt(this, buttonType).getBiometricPromptDialog()
             else PassCheckDialog(buttonType).show(supportFragmentManager, "pass dialog")
         }
     }
@@ -145,6 +168,11 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
+    }
+
+    private fun createSalt() : String {
+        val charPool : List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+        return (1..10).map { kotlin.random.Random.nextInt(0, charPool.size) }.map(charPool::get).joinToString("")
     }
 
 

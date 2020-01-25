@@ -47,18 +47,28 @@ class PassCheckDialog(private val buttonType: String): DialogFragment() {
                 override fun onSuccess(querySnapshot: QuerySnapshot?) {
 
                     if (querySnapshot != null) {
+                        var salt = String()
+                        //first, we get the salt
+                        for(doc in querySnapshot.documents){
+                            if(doc.id == "saltDoc"){
+                                salt = doc.data!!["salt"].toString()
+                            }
+                        }
+
                         for(doc in querySnapshot.documents){
                             //we search for the password Document in the database
                             //the pass try in sha256 must be equal to the one saved and encoded before
                             if(doc.id == "passwordDoc"){
-                                if(doc.data!!["pass"] == HashClass.sha256(passTry)){
+                                if(doc.data!!["pass"] == HashClass.sha256(passTry + salt)){
                                     if(buttonType == "ACCESS_MESSAGE"){
                                         val i = Intent(dialogView.context, MessageActivity::class.java)
+                                        i.putExtra("passUserTry", passTry)
                                         i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                         dialogView.context.startActivity(i)
                                     }
                                     else if(buttonType == "CHANGE_PASSWORD"){
                                         val i = Intent(dialogView.context, ChangePassActivity::class.java)
+                                        i.putExtra("passUserTry", passTry)
                                         i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                         dialogView.context.startActivity(i)
                                     }

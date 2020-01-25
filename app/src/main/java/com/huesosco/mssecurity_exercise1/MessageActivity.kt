@@ -24,15 +24,15 @@ class MessageActivity : AppCompatActivity() {
     private lateinit var editText: EditText
     private lateinit var button: Button
 
-    private var messageEncryptedPass = String()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_message)
 
+        val passwordByUser: String = intent.extras?.getString("passUserTry")!!
+
         loadXmlReferences()
-        loadMessage()
-        setUpButton()
+        loadMessage(passwordByUser)
+        setUpButton(passwordByUser)
     }
 
     private fun loadXmlReferences(){
@@ -41,7 +41,7 @@ class MessageActivity : AppCompatActivity() {
         button = findViewById(R.id.activity_message_button)
     }
 
-    private fun loadMessage(){
+    private fun loadMessage(pass: String){
         exercise1CollectionRef
             .get()
             .addOnSuccessListener(object: OnSuccessListener<QuerySnapshot> {
@@ -54,17 +54,12 @@ class MessageActivity : AppCompatActivity() {
                         for(doc in querySnapshot.documents){
                             //we search for the message Document in the database, and the AES password, which
                             //is the one set before by the user
-
-                            if(doc.id == "messageDoc")
-                                messageEncrypted = doc.data!!["message"].toString()
-
-                            if(doc.id == "passwordDoc")
-                                messageEncryptedPass = doc.data!!["pass"].toString()
+                            if(doc.id == "messageDoc") messageEncrypted = doc.data!!["message"].toString()
                         }
 
                         //once we have the message encrypted and its pass, we decrypt it
                         textView.text = if(messageEncrypted.isNotEmpty())
-                            AESClass.decryptAES(messageEncrypted, messageEncryptedPass)
+                            AESClass.decryptAES(messageEncrypted, pass)
                         else ""
                         Toast.makeText(applicationContext, "Message successfully loaded.", Toast.LENGTH_SHORT).show()
                     }
@@ -77,14 +72,14 @@ class MessageActivity : AppCompatActivity() {
             })
     }
 
-    private fun setUpButton() {
+    private fun setUpButton(pass: String) {
         button.setOnClickListener {
             val e1 = editText.text.toString()
             if (e1.isEmpty())
                 Toast.makeText(applicationContext, "You must write a message.", Toast.LENGTH_SHORT).show()
             else{
                 exercise1CollectionRef
-                    .document("messageDoc").update("message", AESClass.encryptAES(e1, messageEncryptedPass))
+                    .document("messageDoc").update("message", AESClass.encryptAES(e1, pass))
                     .addOnSuccessListener {
                         Toast.makeText(applicationContext, "Message successfully saved.", Toast.LENGTH_SHORT).show()
                         textView.text = e1
